@@ -52,15 +52,23 @@ public void OnPluginStart()
 public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-
-	if(GetGameTime() - g_fRoundStartTime > g_cvLateSpawnTime.FloatValue && !g_cvRespawnOnDeathT.IntValue && !g_cvRespawnOnDeathCT.IntValue) // if more then x seconds has past and auto respawn is disabled.
+	
+	if(IsPlayerAlive(client))
 	{
-		PrintToChat(client, " \x04No late spawns!");
-		ForcePlayerSuicide(client);
-	}	
+		if(GetGameTime() - g_fRoundStartTime > g_cvLateSpawnTime.FloatValue && !g_cvRespawnOnDeathT.IntValue && !g_cvRespawnOnDeathCT.IntValue) // if more then x seconds has past and auto respawn is disabled.
+		{
+			PrintToChat(client, " \x04No late spawns!");
+			RequestFrame(SlayPlayer, client);
+		}	
+	}
 }
 
 public Action Event_OnRoundStart(Handle event, char[] info, bool dontBroadcast)
 {
 	g_fRoundStartTime = GetGameTime(); // getting the game time.
+}
+
+public void SlayPlayer(any data) 
+{
+	ForcePlayerSuicide(data);
 }
